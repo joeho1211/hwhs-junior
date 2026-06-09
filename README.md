@@ -46,7 +46,7 @@ const SHEET_ID = "1fL1R6sV6MvcaWRXf3TXOi_rHAu13yeycZ6iJfzTQgEw";
 const FOLDER_ID = "1XDWZwaOQtq-2h566_Zy7dNASfF_zZUSS";
 const SENDER_EMAIL = "joeho1211@hwhs.tc.edu.tw";
 
-📝 測試帳號
+##📝 測試帳號
 學生端:
 
 帳號: 2024001
@@ -90,3 +90,47 @@ Excel 欄位對應功能
 例子 1: "完成 Phase B 資料匯入模組 - 支援 Excel 重複檢查"
 例子 2: "新增學生查詢列表 - 50筆分頁 + 搜尋功能"
 例子 3: "修復後台登入空白頁面"
+
+
+---
+
+## **第 7 部分：下次對話時恢復工作**
+
+### **在新對話中：**
+
+1. **告訴我你的 GitHub 連結**
+
+https://github.com/[你的帳號]/招生審查系統
+
+
+2. **我會直接查看你的代碼和進度**
+
+3. **立即繼續開發下一個模組**
+
+---
+
+## 📝 **馬上開始！**
+
+### **5 分鐘快速行動：**
+
+1. ✅ 註冊 GitHub 帳號 → https://github.com
+2. ✅ 建立倉庫（名稱：`recruiting-system`）
+3. ✅ 上傳你的 `Code.gs` 和 HTML 檔案
+4. ✅ 編輯 README.md 說明進度
+5. ✅ 提供你的 GitHub URL 給我
+
+---
+
+## 🆘 **常見問題**
+
+| 問題 | 解答 |
+|------|------|
+| **忘記密碼？** | GitHub 首頁 → Forgot password |
+| **檔案上傳失敗？** | 檔案 < 25MB，格式正確 |
+| **想刪除某個檔案？** | 進入檔案 → Delete（右上角） |
+| **想修改檔案？** | 進入檔案 → Edit（鉛筆圖示） |
+| **如何看修改紀錄？** | 進入檔案 → History |
+
+---
+
+**現在就去 GitHub 建立帳號吧！完成後回來告訴我你的倉庫 URL！** 🚀
