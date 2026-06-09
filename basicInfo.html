@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基本資料 - 申請入學審查資料系統</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }
+        .header { border-bottom: 3px solid #667eea; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #333; font-size: 28px; }
+        .header p { color: #666; font-size: 14px; margin-top: 5px; }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid #eee; }
+        .nav-tabs button { padding: 10px 20px; background: none; border: none; cursor: pointer; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .nav-tabs button.active { color: #667eea; border-bottom-color: #667eea; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
+        .required { color: #e74c3c; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        input:focus, select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 5px rgba(102, 126, 234, 0.1); }
+        input:disabled { background: #f5f5f5; cursor: not-allowed; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-row.full { grid-template-columns: 1fr; }
+        .buttons { display: flex; gap: 10px; margin-top: 30px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary { background: #ddd; color: #333; }
+        .btn-secondary:hover { background: #bbb; }
+        .message { padding: 15px; margin-bottom: 20px; border-radius: 5px; display: none; }
+        .message.error { background: #fee; color: #c33; border-left: 4px solid #c33; }
+        .message.success { background: #efe; color: #3c3; border-left: 4px solid #3c3; }
+        .info-box { background: #f0f4ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; color: #333; font-size: 14px; }
+        .password-rules { font-size: 12px; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>審查資料上傳系統</h1>
+            <p>學生帳號：<span id="displayAccount"></span></p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('basicInfo')">基本資料</button>
+            <button class="tab-btn" onclick="switchTab('score')">成績資料</button>
+            <button class="tab-btn" onclick="switchTab('diversity')">特殊表現</button>
+        </div>
+
+        <!-- 基本資料表單 -->
+        <div id="basicInfo" class="form-section active">
+            <div class="info-box">✓ 完成基本資料設定後，才能填寫成績及特殊表現</div>
+            <form id="basicForm">
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>參加證號 <span class="required">*</span></label>
+                        <input type="text" id="account" disabled>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>姓名 <span class="required">*</span></label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>身分證字號 <span class="required">*</span></label>
+                        <input type="text" id="idNumber" disabled>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>校名 <span class="required">*</span></label>
+                        <input type="text" id="schoolName" required placeholder="請輸入國小名稱">
+                    </div>
+                    <div class="form-group">
+                        <label>公/私立</label>
+                        <select id="schoolType">
+                            <option value="">請選擇</option>
+                            <option value="公立">公立</option>
+                            <option value="私立">私立</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>通知信箱 <span class="required">*</span></label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>手機號碼 <span class="required">*</span></label>
+                        <input type="tel" id="phone" required placeholder="0912345678">
+                    </div>
+                </div>
+
+                <hr style="margin: 30px 0;">
+
+                <h3 style="color: #333; margin-bottom: 20px;">修改密碼</h3>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>新密碼 <span class="required">*</span></label>
+                        <input type="password" id="newPassword" placeholder="至少8個字元，需包含大小寫英文">
+                        <div class="password-rules">✓ 至少8個字元 ✓ 包含大寫字母 ✓ 包含小寫字母</div>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>確認新密碼 <span class="required">*</span></label>
+                        <input type="password" id="confirmPassword" placeholder="再輸入一次新密碼">
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button type="submit" class="btn btn-primary">儲存基本資料</button>
+                    <button type="button" class="btn btn-secondary" onclick="logout()">登出</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 其他Tab內容（佔位符） -->
+        <div id="score" class="form-section">
+            <p style="color: #666;">成績資料模組（Phase 3開發）</p>
+        </div>
+
+        <div id="diversity" class="form-section">
+            <p style="color: #666;">特殊表現模組（Phase 4開發）</p>
+        </div>
+    </div>
+
+    <script>
+        let currentAccount = sessionStorage.getItem('account');
+        
+        window.addEventListener('load', () => {
+            if (!currentAccount) {
+                window.location.href = 'https://script.google.com/macros/d/AKfycbzkLGOykrCdNRhjB1OiwzruOarnMNOXKl79OcBdlqlfnQYlEXvDS05WDuZJhZt0gFeVpQ/usercallback?page=login';
+                return;
+            }
+            document.getElementById('displayAccount').textContent = currentAccount;
+            loadBasicInfo();
+        });
+
+        function loadBasicInfo() {
+            google.script.run.withSuccessHandler((data) => {
+                if (data) {
+                    document.getElementById('account').value = data.account || currentAccount;
+                    document.getElementById('name').value = data.name || '';
+                    document.getElementById('idNumber').value = data.idNumber || '';
+                    document.getElementById('schoolName').value = data.schoolName || '';
+                    document.getElementById('schoolType').value = data.schoolType || '';
+                    document.getElementById('email').value = data.email || '';
+                    document.getElementById('phone').value = data.phone || '';
+                }
+            }).getBasicInfo(currentAccount);
+        }
+
+        document.getElementById('basicForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const schoolName = document.getElementById('schoolName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!name || !schoolName || !email || !phone) {
+                showMessage('請填寫完整資訊', 'error');
+                return;
+            }
+
+            // 密碼修改邏輯
+            if (newPassword || confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    showMessage('新密碼與確認密碼不符', 'error');
+                    return;
+                }
+                if (newPassword.length < 8) {
+                    showMessage('密碼至少8個字元', 'error');
+                    return;
+                }
+                if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword)) {
+                    showMessage('密碼需包含大小寫英文字母', 'error');
+                    return;
+                }
+            }
+
+            const basicData = {
+                account: currentAccount,
+                name: name,
+                schoolName: schoolName,
+                schoolType: document.getElementById('schoolType').value,
+                email: email,
+                phone: phone,
+                newPassword: newPassword || null
+            };
+
+            google.script.run.withSuccessHandler((result) => {
+                if (result.success) {
+                    showMessage('✓ 基本資料已儲存', 'success');
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            }).saveBasicInfo(basicData);
+        });
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // 如果進入 diversity tab，載入資料
+            if (tabName === 'diversity') {
+            loadDiversityData();
+            }
+        }
+
+        function loadDiversityData() {
+        // 動態載入Diversity頁面
+        google.script.run.withSuccessHandler((html) => {
+        document.getElementById('diversity').innerHTML = html;
+        }).getDiversityPage();
+        }
+
+        function showMessage(msg, type) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.textContent = msg;
+            msgDiv.className = 'message ' + type;
+            setTimeout(() => msgDiv.style.display = 'none', 5000);
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'https://script.google.com/macros/d/AKfycbzkLGOykrCdNRhjB1OiwzruOarnMNOXKl79OcBdlqlfnQYlEXvDS05WDuZJhZt0gFeVpQ/usercallback?page=login';
+        }
+    </script>
+</body>
+</html>
