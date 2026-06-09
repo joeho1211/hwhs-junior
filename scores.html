@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成績資料 - 申請入學審查資料系統</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }
+        .semester-section { margin-bottom: 40px; border: 2px solid #667eea; border-radius: 8px; padding: 20px; background: #f9f9ff; }
+        .semester-title { font-size: 18px; font-weight: bold; color: #667eea; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+        .subject-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px; }
+        .subject-group { display: flex; flex-direction: column; }
+        label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 13px; }
+        select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; cursor: pointer; }
+        select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 5px rgba(102, 126, 234, 0.1); }
+        .file-upload { margin-top: 15px; padding: 15px; background: white; border: 2px dashed #667eea; border-radius: 8px; text-align: center; }
+        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-input-wrapper input { position: absolute; left: -9999px; }
+        .file-btn { display: inline-block; padding: 10px 20px; background: #667eea; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .file-btn:hover { background: #5568d3; }
+        .file-name { margin-top: 10px; color: #666; font-size: 12px; }
+        .file-status { margin-top: 5px; padding: 8px; border-radius: 5px; display: none; }
+        .file-status.success { background: #efe; color: #3c3; display: block; }
+        .file-status.error { background: #fee; color: #c33; display: block; }
+        .file-view { margin-top: 5px; }
+        .file-view a { color: #667eea; text-decoration: none; font-size: 12px; }
+        .file-view a:hover { text-decoration: underline; }
+        .buttons { display: flex; gap: 10px; margin-top: 30px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary { background: #ddd; color: #333; }
+        .btn-secondary:hover { background: #bbb; }
+        .message { padding: 15px; margin-bottom: 20px; border-radius: 5px; display: none; }
+        .message.error { background: #fee; color: #c33; border-left: 4px solid #c33; }
+        .message.success { background: #efe; color: #3c3; border-left: 4px solid #3c3; }
+        .info-box { background: #f0f4ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; color: #333; font-size: 13px; border-left: 4px solid #667eea; }
+        .loading { display: none; text-align: center; padding: 20px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header" style="border-bottom: 3px solid #667eea; padding-bottom: 20px; margin-bottom: 30px;">
+            <h1 style="color: #333; font-size: 28px;">成績資料上傳</h1>
+            <p style="color: #666; font-size: 14px; margin-top: 5px;">帳號：<span id="displayAccount"></span></p>
+        </div>
+
+        <div id="message" class="message"></div>
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>資料處理中...</p>
+        </div>
+
+        <div class="info-box">
+            ✓ 請依據國小五年級上、下學期與六年級上學期成績單，逐科輸入等第<br>
+            ✓ 並依序上傳各學期成績單檔案（含導師評語）<br>
+            ✓ 檔案格式：PDF 或圖檔（JPG/PNG），上限 5MB<br>
+            ✓ 截止時間內可重複修改及上傳
+        </div>
+
+        <form id="scoreForm">
+            <!-- 五年級上學期 -->
+            <div class="semester-section">
+                <div class="semester-title">📚 五年級上學期</div>
+                <div class="subject-grid" id="semester1">
+                    <!-- 動態生成 -->
+                </div>
+                <div class="file-upload">
+                    <p style="margin-bottom: 10px; color: #666;">上傳成績單檔案</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="file_5_1" name="file_5_1" accept=".pdf,.jpg,.jpeg,.png">
+                        <label for="file_5_1" class="file-btn">選擇檔案</label>
+                    </div>
+                    <div class="file-name" id="fileName_5_1"></div>
+                    <div class="file-status" id="fileStatus_5_1"></div>
+                    <div class="file-view" id="fileView_5_1"></div>
+                </div>
+            </div>
+
+            <!-- 五年級下學期 -->
+            <div class="semester-section">
+                <div class="semester-title">📚 五年級下學期</div>
+                <div class="subject-grid" id="semester2">
+                    <!-- 動態生成 -->
+                </div>
+                <div class="file-upload">
+                    <p style="margin-bottom: 10px; color: #666;">上傳成績單檔案</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="file_5_2" name="file_5_2" accept=".pdf,.jpg,.jpeg,.png">
+                        <label for="file_5_2" class="file-btn">選擇檔案</label>
+                    </div>
+                    <div class="file-name" id="fileName_5_2"></div>
+                    <div class="file-status" id="fileStatus_5_2"></div>
+                    <div class="file-view" id="fileView_5_2"></div>
+                </div>
+            </div>
+
+            <!-- 六年級上學期 -->
+            <div class="semester-section">
+                <div class="semester-title">📚 六年級上學期</div>
+                <div class="subject-grid" id="semester3">
+                    <!-- 動態生成 -->
+                </div>
+                <div class="file-upload">
+                    <p style="margin-bottom: 10px; color: #666;">上傳成績單檔案</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="file_6_1" name="file_6_1" accept=".pdf,.jpg,.jpeg,.png">
+                        <label for="file_6_1" class="file-btn">選擇檔案</label>
+                    </div>
+                    <div class="file-name" id="fileName_6_1"></div>
+                    <div class="file-status" id="fileStatus_6_1"></div>
+                    <div class="file-view" id="fileView_6_1"></div>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button type="submit" class="btn btn-primary">儲存成績資料</button>
+                <button type="button" class="btn btn-secondary" onclick="goBack()">返回基本資料</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const SUBJECTS = [
+            "語言領域-本國語言",
+            "語言領域-鄉土語言",
+            "語言領域-英語",
+            "數學",
+            "社會",
+            "自然與生活科技",
+            "藝術與人文-音樂",
+            "藝術與人文-舞蹈或戲劇",
+            "藝術與人文-美勞或美術",
+            "健康與體育-健康",
+            "健康與體育-體育"
+        ];
+
+        const GRADES = ["優", "甲", "乙", "丙", "丁"];
+        const SEMESTERS = [
+            { id: "semester1", key: "5_1", label: "五年級上" },
+            { id: "semester2", key: "5_2", label: "五年級下" },
+            { id: "semester3", key: "6_1", label: "六年級上" }
+        ];
+
+        let currentAccount = sessionStorage.getItem('account');
+        let scoreData = {};
+
+        window.addEventListener('load', () => {
+            if (!currentAccount) {
+                window.location.href = '?page=login';
+                return;
+            }
+            document.getElementById('displayAccount').textContent = currentAccount;
+            initializeForm();
+            loadScoreData();
+        });
+
+        function initializeForm() {
+            SEMESTERS.forEach(sem => {
+                const grid = document.getElementById(sem.id);
+                SUBJECTS.forEach((subject, idx) => {
+                    const group = document.createElement('div');
+                    group.className = 'subject-group';
+                    group.innerHTML = `
+                        <label>${subject}</label>
+                        <select name="score_${sem.key}_${idx}" id="score_${sem.key}_${idx}">
+                            <option value="">請選擇</option>
+                            ${GRADES.map(g => `<option value="${g}">${g}</option>`).join('')}
+                        </select>
+                    `;
+                    grid.appendChild(group);
+                });
+            });
+
+            // 檔案上傳事件
+            ['5_1', '5_2', '6_1'].forEach(key => {
+                const fileInput = document.getElementById(`file_${key}`);
+                fileInput.addEventListener('change', (e) => handleFileSelect(e, key));
+            });
+        }
+
+        function loadScoreData() {
+            google.script.run.withSuccessHandler((data) => {
+                scoreData = data || {};
+                populateForm();
+                displayUploadedFiles();
+            }).getScoreData(currentAccount);
+        }
+
+        function populateForm() {
+            SEMESTERS.forEach(sem => {
+                SUBJECTS.forEach((_, idx) => {
+                    const selectId = `score_${sem.key}_${idx}`;
+                    const dataKey = `${sem.key}_${idx}`;
+                    if (scoreData[dataKey]) {
+                        document.getElementById(selectId).value = scoreData[dataKey];
+                    }
+                });
+            });
+        }
+
+        function handleFileSelect(e, semesterKey) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const fileNameEl = document.getElementById(`fileName_${semesterKey}`);
+            const fileStatusEl = document.getElementById(`fileStatus_${semesterKey}`);
+            
+            fileNameEl.textContent = `📄 ${file.name}`;
+
+            // 檔案大小驗證 (5MB = 5120KB)
+            if (file.size > 5 * 1024 * 1024) {
+                fileStatusEl.textContent = '❌ 檔案大小超過 5MB';
+                fileStatusEl.className = 'file-status error';
+                e.target.value = '';
+                return;
+            }
+
+            // 檔案格式驗證
+            const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+            if (!validTypes.includes(file.type)) {
+                fileStatusEl.textContent = '❌ 僅支援 PDF 或圖檔格式';
+                fileStatusEl.className = 'file-status error';
+                e.target.value = '';
+                return;
+            }
+
+            fileStatusEl.textContent = '✓ 檔案驗證通過';
+            fileStatusEl.className = 'file-status success';
+        }
+
+        function displayUploadedFiles() {
+            ['5_1', '5_2', '6_1'].forEach(key => {
+                const fileUrl = scoreData[`file_${key}`];
+                if (fileUrl) {
+                    document.getElementById(`fileView_${key}`).innerHTML = 
+                        `<a href="${fileUrl}" target="_blank">📂 檢視已上傳檔案</a>`;
+                }
+            });
+        }
+
+        document.getElementById('scoreForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            document.getElementById('loading').style.display = 'block';
+            
+            const formData = {};
+            const filesToUpload = {};
+
+            // 收集成績資料
+            SEMESTERS.forEach(sem => {
+                SUBJECTS.forEach((_, idx) => {
+                    const selectId = `score_${sem.key}_${idx}`;
+                    const dataKey = `${sem.key}_${idx}`;
+                    formData[dataKey] = document.getElementById(selectId).value;
+                });
+            });
+
+            // 收集檔案
+            ['5_1', '5_2', '6_1'].forEach(key => {
+                const fileInput = document.getElementById(`file_${key}`);
+                if (fileInput.files[0]) {
+                    filesToUpload[key] = fileInput.files[0];
+                }
+            });
+
+            try {
+                const result = await new Promise((resolve) => {
+                    google.script.run.withSuccessHandler(resolve).saveScoreData(currentAccount, formData, Object.keys(filesToUpload));
+                });
+
+                // 上傳檔案
+                for (const [key, file] of Object.entries(filesToUpload)) {
+                    await uploadFile(file, `score_${key}`);
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                showMessage('✓ 成績資料已儲存', 'success');
+                setTimeout(() => loadScoreData(), 1000);
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                showMessage('❌ 儲存失敗，請稍後再試', 'error');
+            }
+        });
+
+        function uploadFile(file, semesterKey) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const blob = new Blob([e.target.result], { type: file.type });
+                    google.script.run.withSuccessHandler(() => {
+                        resolve();
+                    }).uploadScoreFile(currentAccount, blob, semesterKey);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function showMessage(msg, type) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.textContent = msg;
+            msgDiv.className = 'message ' + type;
+            setTimeout(() => msgDiv.style.display = 'none', 5000);
+        }
+
+        function goBack() {
+            window.location.href = '?page=basicInfo';
+        }
+    </script>
+</body>
+</html>
